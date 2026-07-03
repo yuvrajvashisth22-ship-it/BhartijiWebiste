@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Bharti ji ✨</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-pink: #ec4899;
+            --primary-red: #ef4444;
+            --aurora-1: hsla(333, 70%, 55%, 0.4);
+            --aurora-2: hsla(282, 82%, 54%, 0.3);
+            --aurora-3: hsla(210, 89%, 60%, 0.3);
+            --aurora-4: hsla(35, 90%, 60%, 0.3);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0c0a09;
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        h1, h2 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- Background Aurora Layer --- */
+        .aurora-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            filter: blur(80px);
+            opacity: 0.8;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            mix-blend-mode: screen;
+            animation: move 20s infinite alternate;
+        }
+
+        .blob-1 { background: var(--aurora-1); top: -10%; left: -10%; }
+        .blob-2 { background: var(--aurora-2); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .blob-3 { background: var(--aurora-3); top: 20%; right: 10%; animation-delay: -10s; }
+        .blob-4 { background: var(--aurora-4); bottom: 10%; left: 20%; animation-delay: -15s; }
+
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 100px) scale(1.2); }
+        }
+
+        /* --- Glassmorphism UI --- */
+        .glass-card {
+            background: rgba(12, 10, 9, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to bottom right, #fff, #f472b6, #fb7185);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- Buttons --- */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-red));
+            color: white;
+            padding: 12px 32px;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px -5px rgba(236, 72, 153, 0.5);
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 15px 25px -5px rgba(236, 72, 153, 0.7);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* --- Progress Bar --- */
+        .progress-container {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 20%;
+            background: linear-gradient(to right, var(--primary-pink), var(--primary-red));
+            transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        /* --- Step Handling --- */
+        .step {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .step.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- Bento Grid --- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+
+        .bento-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .span-2 { grid-column: span 2; }
+
+        /* --- Canvas Layer --- */
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- Beating Heart --- */
+        .heart-beat {
+            animation: beat 1.5s infinite;
+            filter: drop-shadow(0 0 15px rgba(236, 72, 153, 0.8));
+        }
+
+        @keyframes beat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Elements -->
+    <div class="aurora-container">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+        <div class="aurora-blob blob-4"></div>
+    </div>
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Progress UI -->
+    <div class="progress-container">
+        <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="experience">
+        
+        <!-- Step 1: Welcome -->
+        <div class="step active" id="step1">
+            <div class="glass-card">
+                <div class="text-6xl mb-6 heart-beat">❤️</div>
+                <h1 class="text-4xl md:text-5xl mb-4 text-gradient">Hey Beautiful,</h1>
+                <p class="text-slate-300 text-lg mb-8 leading-relaxed">
+                    I built a little world for you, just to bring a smile to your face on your special day.
+                </p>
+                <button class="btn-primary" onclick="nextStep(2)">Let's Begin</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Birthday -->
+        <div class="step" id="step2">
+            <div class="glass-card">
+                <div class="text-6xl mb-6">🎉</div>
+                <h1 class="text-4xl md:text-5xl mb-4 text-gradient text-nowrap">Happy Birthday!</h1>
+                <p class="text-slate-300 text-lg mb-8 leading-relaxed">
+                    Another year of you making the world brighter. Your existence is a gift, and I'm so lucky to witness it.
+                </p>
+                <button class="btn-primary" onclick="nextStep(3)">There's more...</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Bento Reasons -->
+        <div class="step" id="step3">
+            <div class="glass-card max-w-2xl">
+                <h2 class="text-3xl mb-2 text-gradient">A Few Things I Adore About You</h2>
+                <div class="bento-grid">
+                    <div class="bento-item span-2">
+                        <h3 class="text-pink-400 font-semibold mb-1">✨ Your Character</h3>
+                        <p class="text-sm text-slate-400">The genuine warmth you show to everyone is something truly rare and beautiful.</p>
+                    </div>
+                    <div class="bento-item">
+                        <h3 class="text-pink-400 font-semibold mb-1">😊 That Smile</h3>
+                        <p class="text-sm text-slate-400">It's a work of art.</p>
+                    </div>
+                    <div class="bento-item">
+                        <h3 class="text-pink-400 font-semibold mb-1">🌟 Those Cheeks</h3>
+                        <p class="text-sm text-slate-400">Apke Soft Soft Chiks.</p>
+                    </div>
+                </div>
+                <button class="btn-primary mt-8" onclick="nextStep(4)">Remember this?</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Wish -->
+        <div class="step" id="step4">
+            <div class="glass-card">
+                <div class="text-6xl mb-6">🎂</div>
+                <h1 class="text-4xl mb-4 text-gradient">My Wish For You</h1>
+                <p class="text-slate-300 text-lg mb-8 leading-relaxed">
+                    May the next year bring you all the love, success, and pure happiness you so rightfully deserve. May your dreams soar higher than ever.
+                </p>
+                <button class="btn-primary" id="finalBtn" onclick="triggerFinale()">Celebrate!</button>
+                
+                <!-- Final Hidden Text -->
+                <div id="finalMessage" class="hidden mt-8">
+                    <h2 class="text-2xl md:text-3xl text-gradient">Happy Birthday, my best friend Bharti ji ✨️💗! ❤️</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * 1. THREE.JS BACKGROUND (Floating 3D Hearts)
+         */
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const hearts = [];
+        const heartShape = new THREE.Shape();
+        heartShape.moveTo(25, 25);
+        heartShape.bezierCurveTo(25, 25, 20, 0, 0, 0);
+        heartShape.bezierCurveTo(-30, 0, -30, 35, -30, 35);
+        heartShape.bezierCurveTo(-30, 55, -10, 77, 25, 95);
+        heartShape.bezierCurveTo(60, 77, 80, 55, 80, 35);
+        heartShape.bezierCurveTo(80, 35, 80, 0, 50, 0);
+        heartShape.bezierCurveTo(35, 0, 25, 25, 25, 25);
+
+        const extrudeSettings = { depth: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
+        const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+        geometry.scale(0.015, 0.015, 0.015);
+        geometry.rotateZ(Math.PI);
+
+        for (let i = 0; i < 25; i++) {
+            const material = new THREE.MeshPhongMaterial({ 
+                color: i % 2 === 0 ? 0xec4899 : 0xef4444, 
+                shininess: 100,
+                specular: 0xffffff
+            });
+            const heart = new THREE.Mesh(geometry, material);
+            heart.position.set(
+                (Math.random() - 0.5) * 15,
+                (Math.random() - 0.5) * 10,
+                (Math.random() - 0.5) * 10
+            );
+            heart.rotation.y = Math.random() * Math.PI;
+            heart.userData = {
+                speed: 0.005 + Math.random() * 0.01,
+                sineOffset: Math.random() * Math.PI * 2
+            };
+            scene.add(heart);
+            hearts.push(heart);
+        }
+
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(1, 1, 1).normalize();
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0x404040));
+
+        camera.position.z = 10;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            hearts.forEach((heart, i) => {
+                heart.position.y += heart.userData.speed;
+                heart.position.x += Math.sin(Date.now() * 0.001 + heart.userData.sineOffset) * 0.005;
+                heart.rotation.y += 0.01;
+                
+                if (heart.position.y > 8) heart.position.y = -8;
+            });
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        /**
+         * 2. NAVIGATION LOGIC
+         */
+        let currentStep = 1;
+
+        function nextStep(stepNumber) {
+            const currentEl = document.getElementById(`step${currentStep}`);
+            const nextEl = document.getElementById(`step${stepNumber}`);
+            
+            // Update Progress Bar
+            const progress = (stepNumber / 4) * 100;
+            gsap.to("#progressBar", { width: `${progress}%`, duration: 0.8, ease: "power2.inOut" });
+
+            // GSAP Transition
+            gsap.to(currentEl, { 
+                opacity: 0, 
+                scale: 0.9, 
+                y: -20, 
+                duration: 0.5, 
+                onComplete: () => {
+                    currentEl.classList.remove('active');
+                    currentEl.style.visibility = 'hidden';
+                    
+                    nextEl.style.visibility = 'visible';
+                    nextEl.classList.add('active');
+                    
+                    gsap.fromTo(nextEl, 
+                        { opacity: 0, scale: 0.95, y: 20 },
+                        { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.7)" }
+                    );
+                    
+                    // Stagger child elements
+                    gsap.from(nextEl.querySelectorAll('.glass-card > *'), {
+                        opacity: 0,
+                        y: 15,
+                        duration: 0.4,
+                        stagger: 0.1,
+                        delay: 0.2
+                    });
+                }
+            });
+
+            currentStep = stepNumber;
+        }
+
+        /**
+         * 3. FINALE SEQUENCE
+         */
+        function triggerFinale() {
+            const btn = document.getElementById('finalBtn');
+            const msg = document.getElementById('finalMessage');
+            
+            // 1. Disable & Fade Button
+            gsap.to(btn, { opacity: 0, y: 10, duration: 0.3, onComplete: () => btn.style.display = 'none' });
+            
+            // 2. Show Final Text
+            msg.classList.remove('hidden');
+            gsap.fromTo(msg, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1, delay: 0.5 });
+
+            // 3. Confetti Explosion
+            const duration = 5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                const particleCount = 50 * (timeLeft / duration);
+                
+                // Powerful Bursts from corners
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+                
+                // Emoji Confetti
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    shapes: ['circle'],
+                    colors: ['#ec4899', '#ef4444']
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    shapes: ['circle'],
+                    colors: ['#ec4899', '#ef4444']
+                });
+            }, 250);
+
+            // 4. Three.js Hearts Swirl & Fade Out
+            hearts.forEach((heart, i) => {
+                gsap.to(heart.position, {
+                    x: (Math.random() - 0.5) * 50,
+                    y: 20, // Float up
+                    z: (Math.random() - 0.5) * 50,
+                    duration: 4,
+                    ease: "power2.in",
+                    delay: i * 0.05
+                });
+                gsap.to(heart.material, {
+                    opacity: 0,
+                    transparent: true,
+                    duration: 3,
+                    delay: 1
+                });
+            });
+        }
+
+        // Initial Animation for Step 1
+        window.onload = () => {
+            gsap.from(".glass-card", { opacity: 0, y: 50, duration: 1.2, ease: "power4.out", delay: 0.5 });
+        };
+    </script>
+</body>
+</html>
